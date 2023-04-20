@@ -49,6 +49,7 @@ func (rt *Router) ValidateRoutes(ctx context.Context, routes []*net.IPNet) error
 		return err
 	}
 	for _, tr := range table {
+		dlog.Tracef(ctx, "checking for overlap with route %q", tr)
 		if iputil.IsZeroMask(tr.RoutedNet) || tr.Default {
 			// This is a default route, so we'll overlap it if needed
 			continue
