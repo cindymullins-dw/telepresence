@@ -168,6 +168,33 @@ func (s *RoutingSuite) Test_ConflictingRoutes() {
 	s.Require().Error(err)
 }
 
+func (s *RoutingSuite) Test_WhitelistedRoutes() {
+	ctx := context.Background()
+	original := "100.70.0.0/16"
+	conflicting := "100.70.4.0/24"
+	whitelist := "100.70.0.0/21"
+
+	device1, routerCancel, err := s.runRouter(ctx, original)
+	s.Require().NoError(err)
+	defer routerCancel()
+
+	device2, routerCancel2, err := s.runRouter(ctx, conflicting, "+"+whitelist)
+	s.Require().NoError(err)
+	defer routerCancel2()
+
+	s.Require().NotEqual(device1, device2)
+
+	ip := iputil.Parse("100.70.4.2")
+	s.Require().NotNil(ip)
+	ipnet := &net.IPNet{IP: ip, Mask: net.CIDRMask(32, 32)}
+
+	route, err := routing.GetRoute(ctx, ipnet)
+	s.Require().NoError(err)
+	// Ensure that the route is for the right device
+	s.Require().Equal(device2, route.Interface.Name)
+
+}
+
 func (s *RoutingSuite) runRouter(pCtx context.Context, args ...string) (string, context.CancelFunc, error) {
 	pc, _, _, ok := runtime.Caller(1)
 	s.Require().True(ok)
