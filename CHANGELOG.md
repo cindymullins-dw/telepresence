@@ -1,5 +1,9 @@
 # Changelog
 
+### 2.14.0 (TBD)
+
+- Bugfix: Replace deprecated info in the JSON output of the telepresence list command.
+
 ### 2.13.0 (April 18, 2023)
 
 - Feature: The Docker network used by a Kind or Minikube (using the "docker" driver) installation, is automatically
@@ -10,7 +14,7 @@
 - Feature: There's a new --address flag to the intercept command allowing users to set the target IP of the intercept.
 
 - Feature: The new flags `--docker-build`, and `--docker-build-opt` was added to `telepresence intercept` to facilitate a
-  docker run directly from a docker context. 
+  docker run directly from a docker context.
 
 - Bugfix: Using `telepresence intercept --docker-run` now works with a container based daemon started with `telepresence connect --docker`
 
