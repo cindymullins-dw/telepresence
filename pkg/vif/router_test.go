@@ -61,6 +61,18 @@ func (s *RoutingSuite) Test_RouteIsAdded() {
 	s.Require().NotNil(ip)
 	ipnet := &net.IPNet{IP: ip, Mask: net.CIDRMask(32, 32)}
 
+	var err error
+	// Print out the routing table for debugging
+	switch runtime.GOOS {
+	case "darwin":
+		err = dexec.CommandContext(ctx, "netstat", "-nr").Run()
+	case "linux":
+		err = dexec.CommandContext(ctx, "ip", "route").Run()
+	case "windows":
+		err = dexec.CommandContext(ctx, "route", "print").Run()
+	}
+	s.Require().NoError(err)
+
 	device, routerCancel, err := s.runRouter(ctx, cidr)
 	s.Require().NoError(err)
 	defer routerCancel()
@@ -69,6 +81,7 @@ func (s *RoutingSuite) Test_RouteIsAdded() {
 	s.Require().NoError(err)
 	// Ensure that the route is for the right device
 	s.Require().Equal(device, route.Interface.Name)
+
 }
 
 func (s *RoutingSuite) Test_RouteIsRemoved() {
